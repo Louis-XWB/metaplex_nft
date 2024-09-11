@@ -1,6 +1,6 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { SolanaNftAnchor } from "../target/types/solana_nft_anchor";
+import { MetaplexNft } from "../target/types/metaplex_nft";
 import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import {
@@ -11,28 +11,29 @@ import {
 } from "@metaplex-foundation/mpl-token-metadata";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { publicKey } from "@metaplex-foundation/umi";
+import { assert } from "chai";
 
 import {
   TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 
-describe("solana-nft-anchor", async () => {
+describe("metaplex_nft", async () => {
   // Configured the client to use the devnet cluster.
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
   const program = anchor.workspace
-    .SolanaNftAnchor as Program<SolanaNftAnchor>;
+    .MetaplexNft as Program<MetaplexNft>;
 
   const signer = provider.wallet;
 
-  // const umi = createUmi("https://api.devnet.solana.com")
-  //   .use(walletAdapterIdentity(signer))
-  //   .use(mplTokenMetadata());
-
-    const umi = createUmi("https://staging-rpc.dev2.eclipsenetwork.xyz")
+  const umi = createUmi("https://api.devnet.solana.com")
     .use(walletAdapterIdentity(signer))
     .use(mplTokenMetadata());
+
+    // const umi = createUmi("https://staging-rpc.dev2.eclipsenetwork.xyz")
+    // .use(walletAdapterIdentity(signer))
+    // .use(mplTokenMetadata());
 
     // https://staging-rpc.dev2.eclipsenetwork.xyz
 
@@ -62,7 +63,7 @@ describe("solana-nft-anchor", async () => {
 
   it("mints nft!", async () => {
     const tx = await program.methods
-      .initNft(metadata.name, metadata.symbol, metadata.uri)
+      .mintNft(metadata.name, metadata.symbol, metadata.uri)
       .accounts({
         signer: provider.publicKey,
         mint: mint.publicKey,
@@ -77,12 +78,11 @@ describe("solana-nft-anchor", async () => {
       })
       .signers([mint])
       .rpc();
-
-    console.log(
-      `mint nft tx: https://explorer.solana.com/tx/${tx}?cluster=devnet`
-    );
-    console.log(
-      `minted nft: https://explorer.solana.com/address/${mint.publicKey}?cluster=devnet`
-    );
+  
+    assert.isNotNull(tx, "Transaction should be defined");
+    console.log(`Mint NFT transaction ID: ${tx}`);
+  
+    const mintedNftAccount = await program.account.mint.fetch(mint.publicKey);
+    assert.isNotNull(mintedNftAccount, "NFT should be minted");
   });
 });
