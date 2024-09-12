@@ -57,7 +57,7 @@ describe("solana-nft-anchor", async () => {
   const metadata = {
     name: "HackQuest",
     symbol: "HQ",
-    uri: "https://raw.githubusercontent.com/687c/solana-nft-native-client/main/metadata.json",
+    uri: "https://raw.githubusercontent.com/Louis-XWB/metaplex_nft/chore_branch/meta.json",
   };
 
   it("mints nft!", async () => {
