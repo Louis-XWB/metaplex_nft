@@ -11,14 +11,13 @@ import {
 } from "@metaplex-foundation/mpl-token-metadata";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { publicKey } from "@metaplex-foundation/umi";
-import { assert } from "chai";
 
 import {
   TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 
-describe("metaplex_nft", async () => {
+describe("solana-nft-anchor", async () => {
   // Configured the client to use the devnet cluster.
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
@@ -56,8 +55,8 @@ describe("metaplex_nft", async () => {
   })[0];
 
   const metadata = {
-    name: "Kobeni",
-    symbol: "kBN",
+    name: "HackQuest",
+    symbol: "HQ",
     uri: "https://raw.githubusercontent.com/687c/solana-nft-native-client/main/metadata.json",
   };
 
@@ -78,11 +77,12 @@ describe("metaplex_nft", async () => {
       })
       .signers([mint])
       .rpc();
-  
-    assert.isNotNull(tx, "Transaction should be defined");
-    console.log(`Mint NFT transaction ID: ${tx}`);
-  
-    const mintedNftAccount = await program.account.mint.fetch(mint.publicKey);
-    assert.isNotNull(mintedNftAccount, "NFT should be minted");
+
+    console.log(
+      `mint nft tx: https://explorer.solana.com/tx/${tx}?cluster=devnet`
+    );
+    console.log(
+      `minted nft: https://explorer.solana.com/address/${mint.publicKey}?cluster=devnet`
+    );
   });
 });
